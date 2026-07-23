@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-espresso: #1b110c;
+  --color-cocoa: #2a1a12;
+  --color-ivory: #faf4eb;
+  --color-champagne: #ead9c2;
+  --color-gold: #c6913c;
+  --color-gold-light: #e3b96a;
+  --color-clay: #8a5a38;
+  --color-discount: #b3312b;
+  --color-whatsapp: #25d366;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes strand-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ivory);
+  color: var(--color-espresso);
+  font-family: var(--font-sans);
+}
+
+.strand-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: strand-draw 2.8s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .strand-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-espresso);
+}
