@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { whatsappLink } from "@/lib/whatsapp";
 import { StrandSvg } from "@/components/strand-svg";
@@ -25,12 +26,12 @@ export function Hero() {
           WhatsApp.
         </p>
         <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
-          <a
-            href="#shop"
+          <Link
+            href="/#shop"
             className="inline-flex items-center justify-center rounded-full bg-gold px-7 py-3.5 text-sm font-semibold text-espresso transition hover:bg-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-light focus-visible:ring-offset-2 focus-visible:ring-offset-espresso"
           >
             Shop the collection
-          </a>
+          </Link>
           <a
             href={whatsappLink(
               `Hello ${SITE.name}! I'd like to make an enquiry.`,

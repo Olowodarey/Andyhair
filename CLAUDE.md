@@ -89,8 +89,10 @@ else is a server component. `CategoryCards` + `ShopSection` share state via
   slugs `notFound()` (404).
 - Category slugs come from `categoryToSlug()` / `slugToCategory()` in
   `data/products.ts` — the single source for the name↔slug mapping.
-- Navbar anchors use `/#shop` etc. (and the logo uses `next/link` to `/`) so nav
-  works from category pages, not just the homepage.
+- All internal navigation uses `next/link` (`Link`) — navbar links + logo, the
+  hero "Shop the collection" CTA, "View all", `CategoryNav`, "Back to home".
+  Anchors point to `/#shop` etc. so they work from category pages too. Only
+  external links (`wa.me`, `tel:`) remain plain `<a>` tags.
 
 ### WhatsApp button (disabled)
 
