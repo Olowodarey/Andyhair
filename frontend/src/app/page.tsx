@@ -2,9 +2,7 @@ import { SITE } from "@/lib/site";
 import { listProducts } from "@/server/products-service";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
-import { ShopProvider } from "@/components/shop-context";
-import { CategoryCards } from "@/components/category-cards";
-import { ShopSection } from "@/components/shop-section";
+import { ShopByCategory } from "@/components/shop-by-category";
 import { WhyUs } from "@/components/why-us";
 import { VisitSection } from "@/components/visit-section";
 import { Footer } from "@/components/footer";
@@ -43,10 +41,7 @@ export default async function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <ShopProvider products={products}>
-          <CategoryCards />
-          <ShopSection />
-        </ShopProvider>
+        <ShopByCategory products={products} />
         <WhyUs />
         <VisitSection />
       </main>
