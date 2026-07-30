@@ -48,14 +48,14 @@ export function ProductModal({
         className="absolute inset-0 bg-espresso/70 backdrop-blur-sm"
       />
       <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-ivory shadow-2xl sm:rounded-2xl">
-        <div className="relative aspect-[16/9]">
+        <div className="relative aspect-[4/5] bg-gradient-to-br from-cocoa via-espresso to-cocoa">
           {product.image ? (
             <Image
               src={product.image}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 100vw, 512px"
-              className="object-cover"
+              className="object-contain"
             />
           ) : (
             <div className="flex h-full items-center justify-center bg-gradient-to-br from-cocoa via-espresso to-cocoa">

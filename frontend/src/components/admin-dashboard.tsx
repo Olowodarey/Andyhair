@@ -42,6 +42,8 @@ function useToken(): string | null {
   );
 }
 
+type AuthFetch = (path: string, init?: RequestInit) => Promise<Response>;
+
 interface FormState {
   category: Category;
   name: string;
@@ -65,6 +67,67 @@ const EMPTY_FORM: FormState = {
   badge: false,
   file: null,
 };
+
+/** Prefill a form from an existing product (for editing). */
+function formFromProduct(p: Product): FormState {
+  return {
+    category: p.category,
+    name: p.name,
+    detail: p.detail,
+    description: p.description,
+    lengths: p.lengths.join(", "),
+    price: String(p.price),
+    oldPrice: p.oldPrice != null ? String(p.oldPrice) : "",
+    badge: p.badge === "New",
+    file: null,
+  };
+}
+
+/** Validate + shape a form into the API payload (shared by add and edit). */
+function toPayload(
+  form: FormState,
+): { ok: true; payload: Record<string, unknown> } | { ok: false; error: string } {
+  const lengths = form.lengths
+    .split(",")
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (lengths.length === 0) {
+    return { ok: false, error: "Enter at least one length, e.g. 16, 18, 20" };
+  }
+  const price = Number(form.price);
+  if (!form.price.trim() || !Number.isFinite(price) || price < 0) {
+    return { ok: false, error: "Enter a valid price" };
+  }
+  const oldPrice = form.oldPrice.trim() ? Number(form.oldPrice) : null;
+  if (oldPrice !== null && (!Number.isFinite(oldPrice) || oldPrice <= price)) {
+    return { ok: false, error: "Old price must be a number higher than the price" };
+  }
+  return {
+    ok: true,
+    payload: {
+      category: form.category,
+      name: form.name.trim(),
+      detail: form.detail.trim(),
+      description: form.description.trim(),
+      lengths,
+      price,
+      oldPrice, // null clears any discount
+      badge: form.badge ? "New" : null, // null clears the badge
+    },
+  };
+}
+
+/** Upload/replace a product photo. Returns an error string or null on success. */
+async function uploadPhoto(
+  authFetch: AuthFetch,
+  id: string,
+  file: File,
+): Promise<string | null> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await authFetch(`/products/${id}/image`, { method: "POST", body });
+  return res.ok ? null : await readError(res);
+}
 
 export function AdminDashboard() {
   const token = useToken();
@@ -176,6 +239,7 @@ function Manager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const data = await fetchProducts();
@@ -196,8 +260,8 @@ function Manager({
   }, []);
 
   /** Fetch with the admin token; logs out on a 401. */
-  const authFetch = useCallback(
-    async (path: string, init: RequestInit = {}) => {
+  const authFetch = useCallback<AuthFetch>(
+    async (path, init = {}) => {
       const res = await fetch(`/api${path}`, {
         ...init,
         headers: { ...init.headers, Authorization: `Bearer ${token}` },
@@ -221,30 +285,15 @@ function Manager({
     setError(null);
     setNotice(null);
     try {
-      const lengths = form.lengths
-        .split(",")
-        .map((s) => parseInt(s.trim(), 10))
-        .filter((n) => Number.isFinite(n) && n > 0);
-      if (lengths.length === 0) {
-        setError("Enter at least one length, e.g. 16, 18, 20");
+      const parsed = toPayload(form);
+      if (!parsed.ok) {
+        setError(parsed.error);
         return;
       }
-
-      const payload: Record<string, unknown> = {
-        category: form.category,
-        name: form.name.trim(),
-        detail: form.detail.trim(),
-        description: form.description.trim(),
-        lengths,
-        price: Number(form.price),
-      };
-      if (form.oldPrice.trim()) payload.oldPrice = Number(form.oldPrice);
-      if (form.badge) payload.badge = "New";
-
       const res = await authFetch("/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(parsed.payload),
       });
       if (!res.ok) {
         setError(await readError(res));
@@ -253,14 +302,9 @@ function Manager({
       const created = (await res.json()) as { id: string };
 
       if (form.file) {
-        const body = new FormData();
-        body.append("file", form.file);
-        const up = await authFetch(`/products/${created.id}/image`, {
-          method: "POST",
-          body,
-        });
-        if (!up.ok) {
-          setError("Product saved, but the photo upload failed.");
+        const uploadError = await uploadPhoto(authFetch, created.id, form.file);
+        if (uploadError) {
+          setError(`Product saved, but the photo upload failed: ${uploadError}`);
           await refresh();
           return;
         }
@@ -288,6 +332,7 @@ function Manager({
         setError(await readError(res));
         return;
       }
+      if (editingId === product.id) setEditingId(null);
       setNotice("Product removed.");
       await refresh();
     } catch (err) {
@@ -300,88 +345,15 @@ function Manager({
       <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne">
         <h2 className="font-display text-xl text-espresso">Add a product</h2>
         <form onSubmit={submit} className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Category">
-            <select
-              value={form.category}
-              onChange={(e) => update("category", e.target.value as Category)}
-              className="w-full rounded-lg border border-champagne px-3 py-2 text-espresso outline-none focus:border-gold"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Name">
-            <Input
-              value={form.name}
-              onChange={(v) => update("name", v)}
-              required
-              placeholder="Raw Vietnamese Bone Straight"
-            />
-          </Field>
-          <Field label="Short detail line" full>
-            <Input
-              value={form.detail}
-              onChange={(v) => update("detail", v)}
-              required
-              placeholder="12A grade · Double drawn · Full & flat"
-            />
-          </Field>
-          <Field label="Description" full>
-            <textarea
-              value={form.description}
-              onChange={(e) => update("description", e.target.value)}
-              required
-              rows={3}
-              className="w-full rounded-lg border border-champagne px-3 py-2 text-espresso outline-none focus:border-gold"
-            />
-          </Field>
-          <Field label="Lengths (inches, comma-separated)" full>
-            <Input
-              value={form.lengths}
-              onChange={(v) => update("lengths", v)}
-              required
-              placeholder="16, 18, 20, 22"
-            />
-          </Field>
-          <Field label="Price (₦)">
-            <Input
-              value={form.price}
-              onChange={(v) => update("price", v)}
-              required
-              type="number"
-              placeholder="185000"
-            />
-          </Field>
-          <Field label="Old price (₦, optional — for a discount)">
-            <Input
-              value={form.oldPrice}
-              onChange={(v) => update("oldPrice", v)}
-              type="number"
-              placeholder="220000"
-            />
-          </Field>
-          <Field label="Photo (optional)">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => update("file", e.target.files?.[0] ?? null)}
-              className="w-full text-sm text-clay file:mr-3 file:rounded-full file:border-0 file:bg-espresso file:px-4 file:py-2 file:text-xs file:font-semibold file:text-ivory"
-            />
-          </Field>
-          <label className="flex items-center gap-2 text-sm text-espresso">
-            <input
-              type="checkbox"
-              checked={form.badge}
-              onChange={(e) => update("badge", e.target.checked)}
-            />
-            Mark as “New”
-          </label>
-
+          <ProductFormFields
+            form={form}
+            update={update}
+            photoLabel="Photo (optional)"
+          />
           <div className="sm:col-span-2">
-            {error && <p className="mb-3 text-sm text-discount">{error}</p>}
+            {error && !editingId && (
+              <p className="mb-3 text-sm text-discount">{error}</p>
+            )}
             {notice && (
               <p className="mb-3 text-sm font-medium text-whatsapp">{notice}</p>
             )}
@@ -412,40 +384,239 @@ function Manager({
             {products.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center gap-4 rounded-xl bg-white p-3 shadow-sm ring-1 ring-champagne"
+                className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-champagne"
               >
-                <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-cocoa">
-                  {p.image && (
-                    <Image
-                      src={p.image}
-                      alt={p.name}
-                      fill
-                      sizes="56px"
-                      className="object-cover"
-                    />
-                  )}
+                <div className="flex items-center gap-4">
+                  <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-cocoa">
+                    {p.image && (
+                      <Image
+                        src={p.image}
+                        alt={p.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-espresso">
+                      {p.name}
+                    </p>
+                    <p className="text-xs text-clay">
+                      {p.category} · {formatNaira(p.price)}
+                      {p.oldPrice != null && (
+                        <span className="text-discount">
+                          {" "}
+                          · was {formatNaira(p.oldPrice)}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingId((id) => (id === p.id ? null : p.id))
+                    }
+                    className="rounded-full px-3 py-1.5 text-sm font-semibold text-espresso transition hover:bg-champagne/50"
+                  >
+                    {editingId === p.id ? "Close" : "Edit"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(p)}
+                    className="rounded-full px-3 py-1.5 text-sm font-semibold text-discount transition hover:bg-discount/10"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-espresso">
-                    {p.name}
-                  </p>
-                  <p className="text-xs text-clay">
-                    {p.category} · {formatNaira(p.price)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => remove(p)}
-                  className="rounded-full px-3 py-1.5 text-sm font-semibold text-discount transition hover:bg-discount/10"
-                >
-                  Delete
-                </button>
+
+                {editingId === p.id && (
+                  <EditForm
+                    product={p}
+                    authFetch={authFetch}
+                    onSaved={async () => {
+                      setEditingId(null);
+                      setNotice("Product updated.");
+                      await refresh();
+                    }}
+                  />
+                )}
               </li>
             ))}
           </ul>
         )}
       </section>
     </div>
+  );
+}
+
+function EditForm({
+  product,
+  authFetch,
+  onSaved,
+}: {
+  product: Product;
+  authFetch: AuthFetch;
+  onSaved: () => void | Promise<void>;
+}) {
+  const [form, setForm] = useState<FormState>(() => formFromProduct(product));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const parsed = toPayload(form);
+      if (!parsed.ok) {
+        setError(parsed.error);
+        return;
+      }
+      const res = await authFetch(`/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.payload),
+      });
+      if (!res.ok) {
+        setError(await readError(res));
+        return;
+      }
+      if (form.file) {
+        const uploadError = await uploadPhoto(authFetch, product.id, form.file);
+        if (uploadError) {
+          setError(`Saved, but the photo upload failed: ${uploadError}`);
+          return;
+        }
+      }
+      await onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={submit}
+      className="mt-4 grid gap-4 rounded-xl bg-ivory p-4 sm:grid-cols-2"
+    >
+      <ProductFormFields
+        form={form}
+        update={update}
+        photoLabel="Replace photo (optional)"
+      />
+      <div className="sm:col-span-2 flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={busy}
+          className="rounded-full bg-gold px-6 py-2.5 text-sm font-semibold text-espresso transition hover:bg-gold-light disabled:opacity-60"
+        >
+          {busy ? "Saving…" : "Save changes"}
+        </button>
+        {error && <p className="text-sm text-discount">{error}</p>}
+      </div>
+    </form>
+  );
+}
+
+/** The shared set of product form inputs, used by both add and edit. */
+function ProductFormFields({
+  form,
+  update,
+  photoLabel,
+}: {
+  form: FormState;
+  update: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+  photoLabel: string;
+}) {
+  return (
+    <>
+      <Field label="Category">
+        <select
+          value={form.category}
+          onChange={(e) => update("category", e.target.value as Category)}
+          className="w-full rounded-lg border border-champagne bg-white px-3 py-2 text-espresso outline-none focus:border-gold"
+        >
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Name">
+        <Input
+          value={form.name}
+          onChange={(v) => update("name", v)}
+          required
+          placeholder="Raw Vietnamese Bone Straight"
+        />
+      </Field>
+      <Field label="Short detail line" full>
+        <Input
+          value={form.detail}
+          onChange={(v) => update("detail", v)}
+          required
+          placeholder="12A grade · Double drawn · Full & flat"
+        />
+      </Field>
+      <Field label="Description" full>
+        <textarea
+          value={form.description}
+          onChange={(e) => update("description", e.target.value)}
+          required
+          rows={3}
+          className="w-full rounded-lg border border-champagne bg-white px-3 py-2 text-espresso outline-none focus:border-gold"
+        />
+      </Field>
+      <Field label="Lengths (inches, comma-separated)" full>
+        <Input
+          value={form.lengths}
+          onChange={(v) => update("lengths", v)}
+          required
+          placeholder="16, 18, 20, 22"
+        />
+      </Field>
+      <Field label="Price (₦)">
+        <Input
+          value={form.price}
+          onChange={(v) => update("price", v)}
+          required
+          type="number"
+          placeholder="185000"
+        />
+      </Field>
+      <Field label="Old price (₦, optional — for a discount)">
+        <Input
+          value={form.oldPrice}
+          onChange={(v) => update("oldPrice", v)}
+          type="number"
+          placeholder="220000"
+        />
+      </Field>
+      <Field label={photoLabel}>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => update("file", e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-clay file:mr-3 file:rounded-full file:border-0 file:bg-espresso file:px-4 file:py-2 file:text-xs file:font-semibold file:text-ivory"
+        />
+      </Field>
+      <label className="flex items-center gap-2 text-sm text-espresso">
+        <input
+          type="checkbox"
+          checked={form.badge}
+          onChange={(e) => update("badge", e.target.checked)}
+        />
+        Mark as “New”
+      </label>
+    </>
   );
 }
 
@@ -490,12 +661,12 @@ function Input({
       onChange={(e) => onChange(e.target.value)}
       required={required}
       placeholder={placeholder}
-      className="w-full rounded-lg border border-champagne px-3 py-2 font-normal text-espresso outline-none focus:border-gold"
+      className="w-full rounded-lg border border-champagne bg-white px-3 py-2 font-normal text-espresso outline-none focus:border-gold"
     />
   );
 }
 
-/** Pull a human-readable message out of a Nest error response. */
+/** Pull a human-readable message out of an API error response. */
 async function readError(res: Response): Promise<string> {
   try {
     const data = (await res.json()) as { message?: string | string[] };
