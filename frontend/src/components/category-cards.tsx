@@ -2,15 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CATEGORIES, categoryToSlug, type Category } from "@/data/products";
+import { CATEGORIES, categoryToSlug } from "@/data/products";
 import { useShop } from "@/components/shop-context";
-
-const CATEGORY_BLURBS: Record<Category, string> = {
-  Attachments: "Braiding fibre for knotless, twists & more",
-  "Luxury Hair": "Raw & virgin bundles that last for years",
-  Wigs: "HD lace units, glueless & ready to wear",
-  Extensions: "Clip-ins & tape-ins for instant length",
-};
 
 export function CategoryCards() {
   const { products } = useShop();
@@ -21,7 +14,6 @@ export function CategoryCards() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORIES.map((category) => {
             const inCategory = products.filter((p) => p.category === category);
-            const count = inCategory.length;
             // Use a product photo from this category as the card background;
             // fall back to the dark gradient when none has a photo yet.
             const bg = inCategory.find((p) => p.image)?.image;
@@ -48,17 +40,14 @@ export function CategoryCards() {
                 )}
 
                 <div className="relative z-10">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">
-                    {count} {count === 1 ? "style" : "styles"}
-                  </p>
-                  <h3 className="mt-2 font-display text-xl text-ivory">
+                  <h3 className="font-display text-xl text-ivory">
                     {category}
                   </h3>
                   <p className="mt-1 text-sm text-champagne/80">
-                    {CATEGORY_BLURBS[category]}
+                    View our variety of {category}
                   </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-gold-light transition group-hover:gap-2">
-                    Shop now
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-gold-light transition group-hover:gap-2">
+                    View more
                     <span aria-hidden>→</span>
                   </span>
                 </div>
