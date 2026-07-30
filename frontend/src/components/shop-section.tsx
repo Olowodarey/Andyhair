@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { categoryToSlug, getProducts } from "@/data/products";
+import { categoryToSlug } from "@/data/products";
 import { useShop } from "@/components/shop-context";
 import { FilterTabs } from "@/components/filter-tabs";
 import { ProductGrid } from "@/components/product-grid";
 
 export function ShopSection() {
-  const { filter } = useShop();
+  const { filter, products } = useShop();
 
-  const products = getProducts();
   const visible =
     filter === "All" ? products : products.filter((p) => p.category === filter);
 

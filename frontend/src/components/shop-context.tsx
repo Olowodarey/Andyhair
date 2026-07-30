@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
-import type { Category } from "@/data/products";
+import type { Category, Product } from "@/data/products";
 
 export type Filter = Category | "All";
 
@@ -10,11 +10,19 @@ interface ShopContextValue {
   setFilter: (filter: Filter) => void;
   /** Set the filter and smooth-scroll the shop section into view. */
   browseCategory: (filter: Filter) => void;
+  /** Catalogue fetched on the server and passed down for client filtering. */
+  products: Product[];
 }
 
 const ShopContext = createContext<ShopContextValue | null>(null);
 
-export function ShopProvider({ children }: { children: React.ReactNode }) {
+export function ShopProvider({
+  products,
+  children,
+}: {
+  products: Product[];
+  children: React.ReactNode;
+}) {
   const [filter, setFilter] = useState<Filter>("All");
 
   const browseCategory = useCallback((next: Filter) => {
@@ -29,7 +37,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ShopContext.Provider value={{ filter, setFilter, browseCategory }}>
+    <ShopContext.Provider value={{ filter, setFilter, browseCategory, products }}>
       {children}
     </ShopContext.Provider>
   );

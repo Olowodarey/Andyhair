@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import {
   CATEGORIES,
   categoryToSlug,
-  getProducts,
   slugToCategory,
 } from "@/data/products";
+import { listProducts } from "@/server/products-service";
 import { SITE } from "@/lib/site";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -16,7 +16,10 @@ import { ProductGrid } from "@/components/product-grid";
 
 type Params = { category: string };
 
-/** Pre-render the "all" page plus one page per category at build time. */
+// Catalogue is DB-backed and should reflect admin changes immediately.
+export const dynamic = "force-dynamic";
+
+/** Known category slugs (used for valid-path hints; pages render per request). */
 export function generateStaticParams(): Params[] {
   return [
     { category: "all" },
@@ -54,9 +57,10 @@ export default async function CategoryPage({
   if (!title) notFound();
 
   const resolvedCategory = category === "all" ? null : slugToCategory(category);
+  const all = await listProducts();
   const products = resolvedCategory
-    ? getProducts().filter((p) => p.category === resolvedCategory)
-    : getProducts();
+    ? all.filter((p) => p.category === resolvedCategory)
+    : all;
 
   return (
     <div className="flex flex-1 flex-col">

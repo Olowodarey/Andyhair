@@ -1,4 +1,5 @@
 import { SITE } from "@/lib/site";
+import { listProducts } from "@/server/products-service";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { ShopProvider } from "@/components/shop-context";
@@ -8,6 +9,9 @@ import { WhyUs } from "@/components/why-us";
 import { VisitSection } from "@/components/visit-section";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+
+// Catalogue is DB-backed and should reflect admin changes immediately.
+export const dynamic = "force-dynamic";
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
@@ -27,7 +31,9 @@ const localBusinessSchema = {
   currenciesAccepted: "NGN",
 };
 
-export default function Home() {
+export default async function Home() {
+  const products = await listProducts();
+
   return (
     <div id="top" className="flex flex-1 flex-col">
       <script
@@ -37,7 +43,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <ShopProvider>
+        <ShopProvider products={products}>
           <CategoryCards />
           <ShopSection />
         </ShopProvider>

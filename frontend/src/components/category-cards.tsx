@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORIES, getProducts, type Category } from "@/data/products";
+import { CATEGORIES, type Category } from "@/data/products";
 import { useShop } from "@/components/shop-context";
 
 const CATEGORY_BLURBS: Record<Category, string> = {
@@ -11,8 +11,7 @@ const CATEGORY_BLURBS: Record<Category, string> = {
 };
 
 export function CategoryCards() {
-  const { browseCategory } = useShop();
-  const products = getProducts();
+  const { browseCategory, products } = useShop();
 
   return (
     <section aria-label="Shop by category" className="bg-ivory">
