@@ -1,6 +1,28 @@
 import { SITE } from "@/lib/site";
 import { whatsappLink } from "@/lib/whatsapp";
 
+/** Short trust points, folded in from the old "Why Andy Hair" section. */
+const HIGHLIGHTS = [
+  "100% raw human hair",
+  "Aba vendor prices",
+  "Nationwide delivery",
+  "Order on WhatsApp",
+];
+
+function Check({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden className={className}>
+      <path
+        d="M5 10l3.5 3.5L15 6.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function VisitSection() {
   return (
     <section
@@ -25,6 +47,17 @@ export function VisitSection() {
               love visitors. Or call us and we&apos;ll walk you through the
               current stock.
             </p>
+            <ul className="mt-6 grid max-w-md grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+              {HIGHLIGHTS.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-sm text-champagne/90"
+                >
+                  <Check className="size-4 shrink-0 text-gold" />
+                  {item}
+                </li>
+              ))}
+            </ul>
             <a
               href={whatsappLink(
                 `Hello ${SITE.name}! I'd like directions to your shop.`,

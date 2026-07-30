@@ -3,7 +3,6 @@ import { listProducts } from "@/server/products-service";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { ShopByCategory } from "@/components/shop-by-category";
-import { WhyUs } from "@/components/why-us";
 import { VisitSection } from "@/components/visit-section";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
@@ -42,7 +41,6 @@ export default async function Home() {
       <main className="flex-1">
         <Hero />
         <ShopByCategory products={products} />
-        <WhyUs />
         <VisitSection />
       </main>
       <Footer />
