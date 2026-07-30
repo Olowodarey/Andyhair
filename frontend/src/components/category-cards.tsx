@@ -21,7 +21,7 @@ export function CategoryCards() {
               <Link
                 key={category}
                 href={`/shop/${categoryToSlug(category)}`}
-                className="group relative flex min-h-[220px] flex-col justify-end overflow-hidden rounded-2xl p-6 text-left shadow-sm ring-1 ring-cocoa transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-gold/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                className="group relative flex min-h-[140px] flex-col justify-end overflow-hidden rounded-2xl p-5 text-left shadow-sm ring-1 ring-cocoa transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-gold/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:min-h-[190px] sm:p-6 lg:min-h-[220px]"
               >
                 {bg ? (
                   <>
