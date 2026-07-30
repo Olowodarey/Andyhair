@@ -22,7 +22,7 @@ export function ProductCard({
             src={product.image}
             alt={product.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
             className="object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
@@ -44,28 +44,30 @@ export function ProductCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
+      <div className="flex flex-1 flex-col gap-0.5 p-3 sm:gap-1 sm:p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gold sm:text-[11px]">
           {product.category}
         </p>
-        <h3 className="font-display text-lg leading-snug text-espresso">
+        <h3 className="font-display text-sm leading-snug text-espresso sm:text-lg">
           <button
             type="button"
             onClick={() => onSelect(product)}
-            className="text-left after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-gold"
+            className="line-clamp-2 text-left after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-gold"
           >
             {product.name}
           </button>
         </h3>
-        <p className="text-sm text-clay">{product.detail}</p>
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+        <p className="line-clamp-1 text-xs text-clay sm:text-sm">
+          {product.detail}
+        </p>
+        <div className="mt-auto flex flex-col gap-2 pt-3 sm:flex-row sm:items-end sm:justify-between">
           <PriceTag price={product.price} oldPrice={product.oldPrice} />
           <a
             href={whatsappOrderLink(product)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Order ${product.name} on WhatsApp`}
-            className="relative z-10 inline-flex items-center gap-1.5 rounded-full bg-espresso px-3.5 py-2 text-xs font-semibold text-ivory transition hover:bg-cocoa focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+            className="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-full bg-espresso px-3.5 py-2 text-xs font-semibold text-ivory transition hover:bg-cocoa focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
           >
             <WhatsAppIcon className="size-3.5 text-whatsapp" />
             Order
