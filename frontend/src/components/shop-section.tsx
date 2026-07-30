@@ -6,11 +6,17 @@ import { useShop } from "@/components/shop-context";
 import { FilterTabs } from "@/components/filter-tabs";
 import { ProductGrid } from "@/components/product-grid";
 
+/** How many products the landing page previews before "View all". */
+const PREVIEW_LIMIT = 8;
+
 export function ShopSection() {
   const { filter, products } = useShop();
 
-  const visible =
+  const matching =
     filter === "All" ? products : products.filter((p) => p.category === filter);
+  // Landing page only teases a few; the full catalogue lives on the shop pages.
+  const preview = matching.slice(0, PREVIEW_LIMIT);
+  const hasMore = matching.length > PREVIEW_LIMIT;
 
   const viewAllHref =
     filter === "All" ? "/shop/all" : `/shop/${categoryToSlug(filter)}`;
@@ -38,20 +44,31 @@ export function ShopSection() {
         </div>
 
         <div className="mt-10">
-          <ProductGrid products={visible} />
+          <ProductGrid products={preview} />
         </div>
 
-        <div className="mt-12 flex justify-center">
-          <Link
-            href={viewAllHref}
-            className="group inline-flex items-center gap-2 rounded-full border border-espresso/15 bg-white px-7 py-3.5 text-sm font-semibold text-espresso shadow-sm transition hover:border-gold hover:text-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
-          >
-            {viewAllLabel}
-            <span aria-hidden className="transition group-hover:translate-x-0.5">
-              →
-            </span>
-          </Link>
-        </div>
+        {matching.length > 0 && (
+          <div className="mt-12 flex flex-col items-center gap-3">
+            {hasMore && (
+              <p className="text-sm text-clay">
+                Showing {preview.length} of {matching.length} — see the rest on
+                the full page.
+              </p>
+            )}
+            <Link
+              href={viewAllHref}
+              className="group inline-flex items-center gap-2 rounded-full border border-espresso/15 bg-white px-7 py-3.5 text-sm font-semibold text-espresso shadow-sm transition hover:border-gold hover:text-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
+            >
+              {viewAllLabel}
+              <span
+                aria-hidden
+                className="transition group-hover:translate-x-0.5"
+              >
+                →
+              </span>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

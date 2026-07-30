@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { CATEGORIES, type Category } from "@/data/products";
+import Link from "next/link";
+import { CATEGORIES, categoryToSlug, type Category } from "@/data/products";
 import { useShop } from "@/components/shop-context";
 
 const CATEGORY_BLURBS: Record<Category, string> = {
@@ -12,7 +13,7 @@ const CATEGORY_BLURBS: Record<Category, string> = {
 };
 
 export function CategoryCards() {
-  const { browseCategory, products } = useShop();
+  const { products } = useShop();
 
   return (
     <section aria-label="Shop by category" className="bg-ivory">
@@ -25,10 +26,9 @@ export function CategoryCards() {
             // fall back to the dark gradient when none has a photo yet.
             const bg = inCategory.find((p) => p.image)?.image;
             return (
-              <button
+              <Link
                 key={category}
-                type="button"
-                onClick={() => browseCategory(category)}
+                href={`/shop/${categoryToSlug(category)}`}
                 className="group relative flex min-h-[220px] flex-col justify-end overflow-hidden rounded-2xl p-6 text-left shadow-sm ring-1 ring-cocoa transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-gold/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 {bg ? (
@@ -62,7 +62,7 @@ export function CategoryCards() {
                     <span aria-hidden>→</span>
                   </span>
                 </div>
-              </button>
+              </Link>
             );
           })}
         </div>

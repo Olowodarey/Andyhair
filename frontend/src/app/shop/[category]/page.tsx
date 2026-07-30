@@ -15,6 +15,10 @@ import { CategoryNav } from "@/components/category-nav";
 import { ProductGrid } from "@/components/product-grid";
 
 type Params = { category: string };
+type Search = { page?: string };
+
+/** Products shown per page on the category listing. */
+const PAGE_SIZE = 12;
 
 // Catalogue is DB-backed and should reflect admin changes immediately.
 export const dynamic = "force-dynamic";
@@ -49,8 +53,10 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<Search>;
 }) {
   const { category } = await params;
   const title = resolveTitle(category);
@@ -61,6 +67,14 @@ export default async function CategoryPage({
   const products = resolvedCategory
     ? all.filter((p) => p.category === resolvedCategory)
     : all;
+
+  // Pagination — clamp the requested page into range.
+  const total = products.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const { page: pageParam } = await searchParams;
+  const page = Math.min(Math.max(1, Number(pageParam) || 1), totalPages);
+  const start = (page - 1) * PAGE_SIZE;
+  const pageItems = products.slice(start, start + PAGE_SIZE);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -88,8 +102,37 @@ export default async function CategoryPage({
             <CategoryNav activeSlug={category} />
 
             <div className="mt-10">
-              <ProductGrid products={products} />
+              <ProductGrid products={pageItems} />
             </div>
+
+            {totalPages > 1 && (
+              <nav
+                aria-label="Pagination"
+                className="mt-12 flex flex-wrap items-center justify-center gap-2"
+              >
+                <PageLink
+                  slug={category}
+                  page={page - 1}
+                  disabled={page <= 1}
+                  label="← Prev"
+                />
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                  <PageLink
+                    key={n}
+                    slug={category}
+                    page={n}
+                    label={String(n)}
+                    active={n === page}
+                  />
+                ))}
+                <PageLink
+                  slug={category}
+                  page={page + 1}
+                  disabled={page >= totalPages}
+                  label="Next →"
+                />
+              </nav>
+            )}
 
             <div className="mt-12 flex justify-center">
               <Link
@@ -106,5 +149,43 @@ export default async function CategoryPage({
       <Footer />
       <WhatsAppButton />
     </div>
+  );
+}
+
+/** A single pagination control — a link, or a dimmed span when disabled. */
+function PageLink({
+  slug,
+  page,
+  label,
+  active,
+  disabled,
+}: {
+  slug: string;
+  page: number;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+}) {
+  const base =
+    "inline-flex min-w-9 items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold transition";
+  if (disabled) {
+    return (
+      <span className={`${base} cursor-not-allowed text-clay/40`}>{label}</span>
+    );
+  }
+  if (active) {
+    return (
+      <span className={`${base} bg-espresso text-ivory`} aria-current="page">
+        {label}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={`/shop/${slug}?page=${page}`}
+      className={`${base} text-espresso ring-1 ring-espresso/15 hover:border-gold hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold`}
+    >
+      {label}
+    </Link>
   );
 }

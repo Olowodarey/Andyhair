@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import type { Category, Product } from "@/data/products";
 
 export type Filter = Category | "All";
@@ -8,8 +8,6 @@ export type Filter = Category | "All";
 interface ShopContextValue {
   filter: Filter;
   setFilter: (filter: Filter) => void;
-  /** Set the filter and smooth-scroll the shop section into view. */
-  browseCategory: (filter: Filter) => void;
   /** Catalogue fetched on the server and passed down for client filtering. */
   products: Product[];
 }
@@ -25,19 +23,8 @@ export function ShopProvider({
 }) {
   const [filter, setFilter] = useState<Filter>("All");
 
-  const browseCategory = useCallback((next: Filter) => {
-    setFilter(next);
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    document.getElementById("shop")?.scrollIntoView({
-      behavior: reducedMotion ? "auto" : "smooth",
-      block: "start",
-    });
-  }, []);
-
   return (
-    <ShopContext.Provider value={{ filter, setFilter, browseCategory, products }}>
+    <ShopContext.Provider value={{ filter, setFilter, products }}>
       {children}
     </ShopContext.Provider>
   );
