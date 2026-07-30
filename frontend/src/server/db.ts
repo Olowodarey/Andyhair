@@ -1,4 +1,9 @@
 import "reflect-metadata";
+// TypeORM loads the Postgres driver via a dynamic `require("pg")`, which the
+// Vercel/Next file tracer can't follow — so `pg` gets left out of the serverless
+// function and TypeORM throws DriverPackageNotInstalledError at runtime. This
+// static import makes the tracer include `pg` (and its deps) in the bundle.
+import "pg";
 import { DataSource } from "typeorm";
 import { ProductSchema } from "./product.schema";
 

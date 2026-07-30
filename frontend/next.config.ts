@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // TypeORM does dynamic requires / native driver loading — keep it out of the
-  // server bundle and require it natively at runtime. (`pg` is auto-externalized.)
-  serverExternalPackages: ["typeorm"],
+  // TypeORM + the pg driver do dynamic requires / native loading — keep them out
+  // of the server bundle and require them natively at runtime.
+  serverExternalPackages: ["typeorm", "pg"],
   images: {
     // Product photos are served from Vercel Blob's public CDN.
     remotePatterns: [
