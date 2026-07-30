@@ -4,7 +4,6 @@ import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { ShopByCategory } from "@/components/shop-by-category";
 import { VisitSection } from "@/components/visit-section";
-import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 
 // Catalogue is DB-backed and should reflect admin changes immediately.
@@ -43,7 +42,6 @@ export default async function Home() {
         <ShopByCategory products={products} />
         <VisitSection />
       </main>
-      <Footer />
       <WhatsAppButton />
     </div>
   );

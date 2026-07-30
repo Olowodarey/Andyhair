@@ -9,7 +9,7 @@ import {
 import { listProducts } from "@/server/products-service";
 import { SITE } from "@/lib/site";
 import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
+import { VisitSection } from "@/components/visit-section";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { CategoryNav } from "@/components/category-nav";
 import { ProductGrid } from "@/components/product-grid";
@@ -144,9 +144,10 @@ export default async function CategoryPage({
             </div>
           </div>
         </section>
+
+        <VisitSection />
       </main>
 
-      <Footer />
       <WhatsAppButton />
     </div>
   );

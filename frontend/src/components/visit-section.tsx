@@ -100,6 +100,10 @@ export function VisitSection() {
             ))}
           </dl>
         </div>
+
+        <div className="mt-14 border-t border-gold/15 pt-6 text-center text-xs text-champagne/50 sm:mt-16">
+          © {new Date().getFullYear()} {SITE.name}. All rights reserved.
+        </div>
       </div>
     </section>
   );
