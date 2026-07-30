@@ -6,10 +6,10 @@ import {
   categoryToSlug,
   type Product,
 } from "@/data/products";
-import { ProductGrid } from "@/components/product-grid";
+import { ProductRail } from "@/components/product-rail";
 
-/** How many products to preview under each category header. */
-const PREVIEW = 4;
+/** How many products to load into each category's scroll rail. */
+const PREVIEW = 10;
 
 export function ShopByCategory({ products }: { products: Product[] }) {
   const sections = CATEGORIES.map((category) => ({
@@ -57,10 +57,10 @@ export function ShopByCategory({ products }: { products: Product[] }) {
                   </div>
 
                   <div className="mt-6">
-                    <ProductGrid products={items.slice(0, PREVIEW)} />
+                    <ProductRail products={items.slice(0, PREVIEW)} />
                   </div>
 
-                  {items.length > PREVIEW && (
+                  {items.length > 2 && (
                     <div className="mt-6 flex justify-center">
                       <Link
                         href={href}
