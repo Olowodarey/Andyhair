@@ -47,4 +47,10 @@ describe("whatsappOrderLink", () => {
     expect(text).toContain(product.detail);
     expect(text).toContain("₦185,000");
   });
+
+  it("includes the product page link so WhatsApp shows a rich preview", () => {
+    const url = new URL(whatsappOrderLink(product));
+    const text = url.searchParams.get("text") ?? "";
+    expect(text).toContain(`${SITE.url}/product/${product.id}`);
+  });
 });

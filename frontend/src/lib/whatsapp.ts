@@ -16,6 +16,10 @@ export function whatsappOrderLink(product: Product): string {
     `${product.name}`,
     `${product.detail}`,
     `Price: ${formatNaira(product.price)}`,
+    "",
+    // The product-page link unfurls into a rich preview (with the product
+    // photo) in the WhatsApp chat once the message is sent.
+    `${SITE.url}/product/${product.id}`,
   ].join("\n");
   return whatsappLink(message);
 }
