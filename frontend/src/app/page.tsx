@@ -22,7 +22,7 @@ const localBusinessSchema = {
     addressRegion: SITE.address.state,
     addressCountry: "NG",
   },
-  url: "https://andyhairventures.ng",
+  url: "https://andyhair.xyz",
   priceRange: "₦₦",
   currenciesAccepted: "NGN",
 };

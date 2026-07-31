@@ -15,7 +15,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://andyhairventures.ng"),
+  metadataBase: new URL("https://andyhair.xyz"),
   title: {
     default: `${SITE.name} — Luxury Hair Vendor in Aba, Nigeria`,
     template: `%s · ${SITE.name}`,

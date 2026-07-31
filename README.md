@@ -36,7 +36,7 @@ changes go live instantly with no redeploy.
 Built as a **single Next.js 16 App-Router app** designed for serverless
 deployment on Vercel.
 
-> **Live demo:** _add your deployed URL here_
+> **🔗 Live site:** **[andyhair.xyz](https://andyhair.xyz/)**
 
 ## Features
 
