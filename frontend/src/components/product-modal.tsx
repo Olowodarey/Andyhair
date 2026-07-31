@@ -21,22 +21,39 @@ export function ProductModal({
     const previouslyFocused = document.activeElement as HTMLElement | null;
     closeButtonRef.current?.focus();
 
+    // Push a history entry so the device/browser Back button closes the modal
+    // instead of navigating away from the page.
+    window.history.pushState({ modal: true }, "");
+    let closedByBack = false;
+
+    const onPopState = () => {
+      closedByBack = true;
+      onClose();
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
+
+    window.addEventListener("popstate", onPopState);
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
 
     return () => {
+      window.removeEventListener("popstate", onPopState);
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+      // If we closed via a button/Escape/backdrop, pop the history entry we
+      // added so Back doesn't leave a dead step. If Back itself closed us, the
+      // entry is already gone.
+      if (!closedByBack) window.history.back();
       previouslyFocused?.focus();
     };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="product-modal-title"
@@ -47,14 +64,14 @@ export function ProductModal({
         onClick={onClose}
         className="absolute inset-0 bg-espresso/70 backdrop-blur-sm"
       />
-      <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-ivory shadow-2xl sm:rounded-2xl">
-        <div className="relative aspect-[4/5] bg-gradient-to-br from-cocoa via-espresso to-cocoa">
+      <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-ivory shadow-2xl">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-gradient-to-br from-cocoa via-espresso to-cocoa">
           {product.image ? (
             <Image
               src={product.image}
               alt={product.name}
               fill
-              sizes="(max-width: 640px) 100vw, 512px"
+              sizes="(max-width: 640px) calc(100vw - 24px), 512px"
               className="object-contain"
             />
           ) : (
