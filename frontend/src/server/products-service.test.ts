@@ -4,7 +4,9 @@ import type { ProductRow } from "@/server/product.schema";
 // --- Mock the data source and blob storage so the service runs without a real
 // Postgres connection or a Vercel Blob token. -----------------------------
 
-const deleteUpload = vi.fn(async (_url: string | null): Promise<void> => {});
+const deleteUpload = vi.fn(async (url: string | null): Promise<void> => {
+  void url;
+});
 vi.mock("@/server/uploads", () => ({
   deleteUpload: (url: string | null) => deleteUpload(url),
 }));

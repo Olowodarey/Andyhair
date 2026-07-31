@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { Product } from "@/data/products";
 import { discountPercent } from "@/lib/format";
 import { whatsappOrderLink } from "@/lib/whatsapp";
@@ -151,6 +152,13 @@ export function ProductModal({
             <WhatsAppIcon className="size-4" />
             Order this on WhatsApp
           </a>
+
+          <Link
+            href={`/product/${product.id}`}
+            className="inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-clay transition hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-full px-3 py-1.5"
+          >
+            View full page <span aria-hidden>↗</span>
+          </Link>
         </div>
       </div>
     </div>
