@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { SITE } from "@/lib/site";
 import { whatsappLink } from "@/lib/whatsapp";
 
@@ -101,8 +102,17 @@ export function VisitSection() {
           </dl>
         </div>
 
-        <div className="mt-14 border-t border-gold/15 pt-6 text-center text-xs text-champagne/50 sm:mt-16">
-          © {new Date().getFullYear()} {SITE.name}. All rights reserved.
+        <div className="mt-14 flex flex-col items-center gap-4 border-t border-gold/15 pt-8 text-center sm:mt-16">
+          <Image
+            src="/logo.png"
+            alt={SITE.name}
+            width={1639}
+            height={249}
+            className="h-10 w-auto opacity-90 sm:h-12"
+          />
+          <p className="text-xs text-champagne/50">
+            © {new Date().getFullYear()} {SITE.name}. All rights reserved.
+          </p>
         </div>
       </div>
     </section>

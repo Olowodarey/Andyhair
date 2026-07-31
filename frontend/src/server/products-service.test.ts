@@ -4,7 +4,7 @@ import type { ProductRow } from "@/server/product.schema";
 // --- Mock the data source and blob storage so the service runs without a real
 // Postgres connection or a Vercel Blob token. -----------------------------
 
-const deleteUpload = vi.fn(async () => {});
+const deleteUpload = vi.fn(async (_url: string | null): Promise<void> => {});
 vi.mock("@/server/uploads", () => ({
   deleteUpload: (url: string | null) => deleteUpload(url),
 }));
@@ -21,7 +21,7 @@ function makeRepo(seed: ProductRow[] = []) {
     create: vi.fn((data: Partial<ProductRow>) => ({ ...data }) as ProductRow),
     save: vi.fn(async (entity: ProductRow) => {
       const existing = rows.findIndex((r) => r.id === entity.id);
-      const saved = { id: entity.id ?? "generated-id", ...entity } as ProductRow;
+      const saved = { ...entity, id: entity.id ?? "generated-id" } as ProductRow;
       if (existing >= 0) rows[existing] = saved;
       else rows.push(saved);
       return saved;

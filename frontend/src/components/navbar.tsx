@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -21,9 +22,17 @@ export function Navbar() {
       >
         <Link
           href="/"
-          className="font-display text-lg text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm"
+          aria-label={`${SITE.name} — home`}
+          className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         >
-          Andy<span className="text-gold"> Hair</span> Ventures
+          <Image
+            src="/logo.png"
+            alt={SITE.name}
+            width={1639}
+            height={249}
+            priority
+            className="h-9 w-auto sm:h-11"
+          />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
