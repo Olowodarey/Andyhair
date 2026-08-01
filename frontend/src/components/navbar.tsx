@@ -22,7 +22,7 @@ export function Navbar() {
       >
         <Link
           href="/"
-          aria-label={`${SITE.name} — home`}
+          aria-label={`${SITE.name} home`}
           className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         >
           <Image

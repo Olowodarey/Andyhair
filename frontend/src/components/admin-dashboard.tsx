@@ -141,7 +141,7 @@ export function AdminDashboard() {
         <header className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="font-display text-2xl text-espresso">
-              Andy Hair — Admin
+              Andy Hair Admin
             </h1>
             <p className="text-sm text-clay">Manage your product catalogue</p>
           </div>
@@ -268,7 +268,7 @@ function Manager({
       });
       if (res.status === 401) {
         onUnauthorized();
-        throw new Error("Session expired — please log in again");
+        throw new Error("Session expired. Please log in again");
       }
       return res;
     },
@@ -378,7 +378,7 @@ function Manager({
         {loading ? (
           <p className="mt-4 text-clay">Loading…</p>
         ) : products.length === 0 ? (
-          <p className="mt-4 text-clay">No products yet — add one above.</p>
+          <p className="mt-4 text-clay">No products yet. Add one above.</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {products.map((p) => (
@@ -592,7 +592,7 @@ function ProductFormFields({
           placeholder="185000"
         />
       </Field>
-      <Field label="Old price (₦, optional — for a discount)">
+      <Field label="Old price (₦, optional, for a discount)">
         <Input
           value={form.oldPrice}
           onChange={(v) => update("oldPrice", v)}

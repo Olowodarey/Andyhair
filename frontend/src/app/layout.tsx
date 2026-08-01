@@ -17,12 +17,12 @@ const jost = Jost({
 export const metadata: Metadata = {
   metadataBase: new URL("https://andyhair.xyz"),
   title: {
-    default: `${SITE.name} — Luxury Hair Vendor in Aba, Nigeria`,
+    default: `${SITE.name} · Luxury Hair Vendor in Aba, Nigeria`,
     template: `%s · ${SITE.name}`,
   },
   description: SITE.description,
   openGraph: {
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `${SITE.name} · ${SITE.tagline}`,
     description: SITE.description,
     type: "website",
     locale: "en_NG",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `${SITE.name} · ${SITE.tagline}`,
     description: SITE.description,
   },
 };

@@ -3,7 +3,7 @@ export const SITE = {
   url: "https://andyhair.xyz",
   tagline: "Luxury hair that moves like it's yours.",
   description:
-    "Luxury hair vendor in Aba, Abia State — raw luxury hair, HD lace wigs, braiding attachments and extensions. Order directly on WhatsApp.",
+    "Luxury hair vendor in Aba, Abia State. Raw luxury hair, HD lace wigs, braiding attachments and extensions. Order directly on WhatsApp.",
   address: {
     street: "Micro Plaza, Eyimba",
     city: "Aba",

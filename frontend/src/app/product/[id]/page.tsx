@@ -27,7 +27,7 @@ export async function generateMetadata({
   const product = await getProduct(id);
   if (!product) return { title: "Product not found" };
 
-  const description = `${product.detail} — ${product.description}`.slice(0, 160);
+  const description = `${product.detail}. ${product.description}`.slice(0, 160);
   return {
     title: product.name,
     description,

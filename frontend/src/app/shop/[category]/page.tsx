@@ -47,7 +47,7 @@ export async function generateMetadata({
   if (!title) return {};
   return {
     title,
-    description: `Browse ${title.toLowerCase()} from ${SITE.name} — ${SITE.description}`,
+    description: `Browse ${title.toLowerCase()} from ${SITE.name}. ${SITE.description}`,
   };
 }
 

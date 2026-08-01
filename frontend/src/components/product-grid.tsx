@@ -11,7 +11,7 @@ import { ProductModal } from "@/components/product-modal";
  */
 export function ProductGrid({
   products,
-  emptyMessage = "No products in this category yet — check back soon.",
+  emptyMessage = "No products in this category yet. Check back soon.",
 }: {
   products: Product[];
   emptyMessage?: string;

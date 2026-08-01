@@ -21,7 +21,7 @@ export function Hero() {
           like it&apos;s yours.
         </h1>
         <p className="mt-6 max-w-xl text-base text-champagne/80 sm:text-lg">
-          Raw bundles, HD lace wigs, attachments and extensions — hand-picked
+          Raw bundles, HD lace wigs, attachments and extensions, hand-picked
           in {SITE.address.city} and delivered nationwide. Order in two taps on
           WhatsApp.
         </p>

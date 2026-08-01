@@ -44,7 +44,7 @@ export function VisitSection() {
               yourself.
             </h2>
             <p className="mt-4 max-w-md text-champagne/80">
-              Prefer to see and feel before you buy? Stop by the plaza — we
+              Prefer to see and feel before you buy? Stop by the plaza. We
               love visitors. Or call us and we&apos;ll walk you through the
               current stock.
             </p>

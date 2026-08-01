@@ -35,7 +35,7 @@ export function ShopByCategory({ products }: { products: Product[] }) {
 
         {sections.length === 0 ? (
           <p className="mt-12 text-center text-clay">
-            Products coming soon — check back shortly.
+            Products coming soon. Check back shortly.
           </p>
         ) : (
           <div className="mt-14 space-y-16">
