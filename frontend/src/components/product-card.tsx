@@ -15,7 +15,7 @@ export function ProductCard({
   onSelect: (product: Product) => void;
 }) {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-champagne transition hover:shadow-lg hover:ring-gold/60">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-champagne transition hover:shadow-lg hover:ring-gold/60">
       <div className="relative aspect-[4/5] overflow-hidden">
         {product.image ? (
           <Image
